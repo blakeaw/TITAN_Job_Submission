@@ -32,7 +32,7 @@ USINGMODULE="FALSE"; # set to TRUE if you are using an existing TITAN module - F
 MODULENAME="none"; # if using TITAN module, give the name/version
 USINGSOURCE="TRUE"; # set to TRUE if you want to call a source file - this will add a source call to the pbs 
 #                   e.g. source GMXRC
-SOURCEPATH="some_path_to/GMXRC"; #give the source path
+SOURCEPATH="some_path_to/GMXRC"; #give the source path -- assumed to version 5
 EXEC="gmx_mpi"; # name of the executable -- if you are not using a TITAN module or source call, then give the full path 
 #				to the program executable--include the binary name
 
@@ -285,9 +285,9 @@ for (( i = COPY_START; i <= COPY_END; i++ )); do
 		else
 			PREV_PROD=$(( $j - 1 ))
 			PREV_OF_PRE="${PROD_NAME_PRE}_c${i}_p${PREV_PROD}"
-			OF_PRE="${PROD_NAME_PRE}_c${i}_p${j}"
-			echo "aprun gmx_mpi convert-tpr -s ${PREV_OF_PRE}.tpr -f ${PREV_OF_PRE}.trr -e ${PREV_OF_PRE}.edr -o ${OF_PRE}.tpr -extend ${EXTEND}" >> $ofile
-			echo "aprun -n ${NMPIRANK} -d ${OMPTPN} gmx_mpi mdrun -ntomp ${OMPTPN} -v -deffnm ${OF_PRE} -gpu_id 0" >> $ofile
+			OF_PRE="${PROD_NAME_PRE}_c${i}_p${j}
+			echo "aprun gmx_mpi convert-tpr -s ${PREV_OF_PRE}.tpr -o ${OF_PRE}.tpr -extend ${EXTEND}" >> $ofile
+			echo "aprun -n ${NMPIRANK} -d ${OMPTPN} gmx_mpi mdrun -ntomp ${OMPTPN} -v -cpi ${PREV_OF_PRE}.cpt -deffnm ${OF_PRE} -gpu_id 0" >> $ofile
 			if [[ ${FIRSTP} == 1 ]]; then
 				echo "     first of the productions.."
 				JID=`qsub ${ofile}`; #capture the job id for conditional execution of chained jobs
