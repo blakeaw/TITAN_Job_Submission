@@ -229,7 +229,7 @@ for (( i = COPY_START; i <= COPY_END; i++ )); do
 			INFILE="${CURRENT_RUN}.inp"
 			sed -e "s/xx_prodname_xx/${CURRENT_RUN}/g" "../${PRODCONF_PRE}" | sed -e "s/xx_previous_xx/${LASTEQUIL}/g" > ${INFILE}
 			echo "# input file for this run is : $INFILE" >> $ofile
-			echo "aprun -n ${NMPIRANK} -N 1 -d ${CORESPERNODE} ${EXEC} +setcpuaffinity +ppn ${CPNM1}  +pemap 1-${CPNM1} +commap 0 ${INFILE}" >> $ofile
+			echo "aprun -n ${NMPIRANK} -N 1 -d ${CORESPERNODE} ${EXEC} +setcpuaffinity +idlepoll +ppn ${CPNM1}  +pemap 1-${CPNM1} +commap 0 ${INFILE}" >> $ofile
 			#submit production 0
 			JID=`qsub ${ofile}`; #capture the job id for conditional execution of chained jobs	
 		#other productions: successive production runs are chained off of each other using the -extend flag for gmx-convert		
@@ -245,7 +245,7 @@ for (( i = COPY_START; i <= COPY_END; i++ )); do
 			INFILE="${CURRENT_RUN}.inp"
 			sed -e "s/xx_prodname_xx/${CURRENT_RUN}/g" "../${PRODCONF_PRE}" | sed -e "s/xx_previous_xx/${LASTRUN}/g" > ${INFILE}
 			echo "# input file for this run is : $INFILE" >> $ofile
-			echo "aprun -n ${NMPIRANK} -N 1 -d ${CORESPERNODE} ${EXEC} +setcpuaffinity +ppn ${CPNM1}  +pemap 1-${CPNM1} +commap 0 ${INFILE}" >> $ofile
+			echo "aprun -n ${NMPIRANK} -N 1 -d ${CORESPERNODE} ${EXEC} +setcpuaffinity +idlepoll +ppn ${CPNM1}  +pemap 1-${CPNM1} +commap 0 ${INFILE}" >> $ofile
 			if [[ ${FIRSTP} == 1 ]]; then
 				echo "     first of the productions.."
 				JID=`qsub ${ofile}`; #capture the job id for conditional execution of chained jobs
