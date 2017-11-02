@@ -1,6 +1,6 @@
 #!/bin/bash
 ## Script to generate a pbs file for batch submission on a closer
-## run witout arguments to see usage 
+## run witout arguments to see usage
 ### variables
 # REQUIRED PBS vars
 GROUP="FALSE" ; # input flag is -group="groupname"
@@ -10,8 +10,8 @@ NODES="FALSE"; # input flag is nodes=number_nodes
 #Optional PBS vars - common
 JOBNAME="TITAN_job"; # input flag is -jobname="job_name"
 
-#Additional PBS commands 
-ADDPBS="FALSE"; # input flag is -addpbs="pbsdir1, pbsdir2" 
+#Additional PBS commands
+ADDPBS="FALSE"; # input flag is -addpbs="pbsdir1, pbsdir2"
 ADDPBSDIR=""
 # REQUIRED - give the thing to execute- include aprun and aprun_flags
 EXECUTE="FALSE"; # input flag is -execute="aprun ap_flags binary bin_flags"
@@ -33,7 +33,7 @@ SERFLAG="FALSE"; # to change to serial, use input flag -serial
 #Flag for multirep runs to executed in the same directory - default is FALSE
 SDFLAG="FALSE"; # to change to same dir, use input flag -samedir
 #Flag for variable expansion in the executable string" - defaut is FALSE
-#EVFLAG="TRUE"; # activate with the -eval input flag 
+#EVFLAG="TRUE"; # activate with the -eval input flag
 ####USAGE
 MINARGS=4
 NARGS=$#
@@ -47,15 +47,15 @@ if [[  $NARGS < $MINARGS ]]; then
 	echo "-ncopies=int_number : set the number of duplicate simulations to run, -addpbs=\"pbsdir1;pbsdir2\" : add any additional pbs directives using a semi-colon separated list (do not include #PBS)"
 	echo "-pdir : switch to PROJWORK storage directory. MEMBERWORK is the default."
 	echo "-serial : removes the backgrounding for multi-rep jobs. i.e. the reps are run in serial"
-	echo "-samedir : for multi-rep jobs. Places the rep executions in the same directory. " 
+	echo "-samedir : for multi-rep jobs. Places the rep executions in the same directory. "
 	echo "OTHER FEATURES:"
 	echo "The identifier '#r%' can be used inside the execute flag for multi-rep jobs to denote the rep number. The identifier will be replaced with the rep number."
-	echo "        Example: -ncopies=2 -execute=\"aprun gmx mdrun in_#r%_rep.tpr\""  
+	echo "        Example: -ncopies=2 -execute=\"aprun gmx mdrun in_#r%_rep.tpr\""
 	echo "The identifier '#rp%' can be used inside the execute flag for multi-rep jobs to denote the rep number minus one. The identifier will be replaced with (rep number -1) on all reps greater than 1. On the first rep (1) it will simply be removed."
 	echo "NOTES: "
 	echo " For this script to work, you need to give the full paths to the simulation input files."
 	echo " If you need to execute multiple commands/programs, you can put them all in the string for the execute flag using semi-colons"
-	echo "e.g.: -execute=\"bash command;aprun prog1 in1;aprun prog2 in2\"" 
+	echo "e.g.: -execute=\"bash command;aprun prog1 in1;aprun prog2 in2\""
     exit
 fi
 
@@ -65,7 +65,7 @@ INFLAGS=`echo "$@"`
 for i in "$@"
 do
 #echo $i
-case $i in 
+case $i in
 	-group=*)
 		GROUP="${i#*=}"
 		#echo $GROUP
@@ -78,8 +78,8 @@ case $i in
 	-nodes=*)
 		NODES="${i#*=}"
 		# check nodes argument, should be a positive integer
-		case ${NODES#[+]} in *[!0-9]* ) 
-			echo "Error: NODES -> \"$NODES\" is not a positive integer. The number of nodes should be a positive integer!"; 
+		case ${NODES#[+]} in *[!0-9]* )
+			echo "Error: NODES -> \"$NODES\" is not a positive integer. The number of nodes should be a positive integer!";
 			exit ;;
 		esac
 		shift
@@ -93,7 +93,7 @@ case $i in
 		TEMP="${i#*=}"
 		ADDPBS="TRUE"
 		ADDPBSDIR=$(echo $TEMP | tr "," "\n")
-		
+
 		shift
 		;;
 	-pbsname=*)
@@ -106,10 +106,10 @@ case $i in
 		;;
 	-ncopies=*)
 		NCOPIES="${i#*=}"
-		
+
 		# check nodes argument, should be a positive integer
-		case ${NCOPIES#[+]} in *[!0-9]* ) 
-			echo "Warning: NCOPIES -> \"$NCOPIES\" is not a positive integer greater than 0. The number of copies should be a positive integer greater than 0!" 
+		case ${NCOPIES#[+]} in *[!0-9]* )
+			echo "Warning: NCOPIES -> \"$NCOPIES\" is not a positive integer greater than 0. The number of copies should be a positive integer greater than 0!"
 			echo "setting NCOPIES back to the default $MINCOPIES"
 			NCOPIES=1;;
 			#exit ;;
@@ -194,7 +194,7 @@ if [[ $ADDPBS == "TRUE" ]]; then
 	echo "## additional PBS directives" >> $PBSNAME
 	# split the directives into a bash array
 	IFS=';' read -r -a darray <<< "$ADDPBSDIR"
-	# loop over the directives array (darray) 
+	# loop over the directives array (darray)
 	for dir in "${darray[@]}"
 	do
 		echo "#PBS $dir" >> $PBSNAME
@@ -212,7 +212,7 @@ THE_USER=`whoami`
 CWORK="${THE_USER}_${GROUP}_${JOBNAME}"
 #if [ -d "$CWORK" ]; then
   # Control will enter here if $DIRECTORY exists.
-#  echo "# The subdirectory $CWORK already exists" >> $PBSNAME	
+#  echo "# The subdirectory $CWORK already exists" >> $PBSNAME
 #fi
 #if [ ! -d "$CWORK" ]; then
   # Control will enter here if $DIRECTORY doesn't exist.
@@ -233,8 +233,8 @@ if [[ $NCOPIES > 1 ]]; then
 	echo "# This invocation will run $NCOPIES copies of the executable \"$EXECUTE\" on the compute nodes allocated by the batch system." >> $PBSNAME
 	# check for the serial flag
 	if [[ $SERFLAG == "FALSE" ]]; then
-		EXECUTE=`echo "$EXECUTE &"`	
-	fi	
+		EXECUTE=`echo "$EXECUTE &"`
+	fi
 	if [[ $SDFLAG == "TRUE" ]]; then
 		echo "# Running mulitple copies with -samedir flag, so do not make subdirectories for each copy" >> $PBSNAME
 		for (( i = 1; i <= NCOPIES; i++ )); do
@@ -244,7 +244,7 @@ if [[ $NCOPIES > 1 ]]; then
 			#echo "im1 $im1"
 			NEXECUTE=`echo ${NEXECUTE//#rp%/${im1}}`
 			echo "$NEXECUTE" >> $PBSNAME
-		
+
 		done
 	else
 		echo "# Running mulitple copies, so make subdirectories for each copy" >> $PBSNAME
@@ -260,7 +260,7 @@ if [[ $NCOPIES > 1 ]]; then
 			echo "cd .." >> $PBSNAME
 		done
 	fi
-	echo -e "# The wait command will prevent the batch script \n # from returning until each background-ed aprun completes.\n # Without the \"wait\" the script will return once each aprun has been started, \n # causing the batch job to end, which kills each of the background-ed aprun processes." >> $PBSNAME 
+	echo -e "# The wait command will prevent the batch script \n # from returning until each background-ed aprun completes.\n # Without the \"wait\" the script will return once each aprun has been started, \n # causing the batch job to end, which kills each of the background-ed aprun processes." >> $PBSNAME
 echo "wait" >> $PBSNAME
 fi
 
@@ -274,8 +274,4 @@ echo "The name is: $PBSNAME"
 echo "to sumbit:"
 echo " qsub $PBSNAME"
 echo "Before submitting, make sure you loaded the necessary modules."
-echo "Best of luck and good day to you sir!"
-
-
-
-
+echo "Best of luck and good day to you!"
